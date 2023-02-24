@@ -6,11 +6,8 @@ const fileupload = require('express-fileupload');
 
 const apiroutes = require('./src/routes');
 
-<<<<<<< HEAD
-=======
-mongoose.set("strictQuery", false);//aqui tira o erro do mongoose 
-
->>>>>>> 5a43d62c03f66c5669aa458cfb57e40169cf2870
+mongoose.set("strictQuery", false); //aqui tira o erro do mongoose 
+    
 mongoose.connect(process.env.DATABASE, {
     useNewUrlParser: true,
     
