@@ -40,6 +40,19 @@ module.exports = {
             res.json({error: 'Titulo e/ou categoria não foram preenchidos'});
             return;
         }
+        
+        if(cat,length < 12) {
+            res.json({error: 'ID de categoria invalido'});
+            return;
+        }
+
+        const category = await Category.findById(cat);
+        
+        if(!category) {
+            res.json({error: 'Categoria inexistente.'})
+            return;
+        }
+
         if(price) {
             price = price.replace('.', '').replace(',','.').replace('R$', '');//formatando para o padrão
             price = parseFloat(price);
@@ -272,7 +285,34 @@ module.exports = {
         }
 
         await Ad.findByIdAndUpdate(id, {$set: updates});
-        // TODO: Novas imagens
+        
+        if(req.files && req.files.img) {
+            const adI = await Ad.findById(id);
+
+            if(req.files.img.length == undefined) {
+                if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img.mimetype)) {
+                    let url = await addImage(req.files.img.data);
+                    adI.images.push({
+                        url,
+                        default: false
+                    });
+                }
+            } else {
+                for(let i=0; i < req.files.img.length; i++) {
+                    if(['image/jpeg', 'image/jpg', 'image/png'].includes(req.files.img[i].mimetype)) {
+                        let url = await addImage(req.files.img[i].data);
+                        adI.images.push({
+                            url,
+                            default: false
+                        });
+                    }
+                }
+            }
+
+            adI.images = [...adI.images];
+            await adI.save();
+        }
+
         res.json({error: ''});
 
     },
